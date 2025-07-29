@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 
+# Visualization GUI component for the custom environment
 def draw_environment(window, grid_size, cell_size, agent_location, target_location, obstacles):
     window_size = grid_size * cell_size
     canvas = pygame.Surface((window_size, window_size))

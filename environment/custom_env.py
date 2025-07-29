@@ -3,10 +3,10 @@ from gymnasium import spaces
 import numpy as np
 import pygame
 import random
-from rendering import draw_environment
+from .rendering import draw_environment
 
+# Custom environment simulating a student navigating career opportunities
 class CustomEnv(gym.Env):
-    """A custom environment simulating a student navigating career opportunities."""
     metadata = {
         "render_modes": ["human"],
         "render_fps": 4
