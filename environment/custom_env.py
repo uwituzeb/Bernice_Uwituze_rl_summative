@@ -3,6 +3,7 @@ from gymnasium import spaces
 import numpy as np
 import pygame
 import random
+from rendering import draw_environment
 
 class CustomEnv(gym.Env):
     """A custom environment simulating a student navigating career opportunities."""
@@ -113,43 +114,14 @@ class CustomEnv(gym.Env):
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
 
-        canvas = pygame.Surface((self.window_size, self.window_size))
-        canvas.fill((255, 255, 255))
-        pix_square_size = self.cell_size
-
-        # Draw target
-        pygame.draw.rect(
-            canvas,
-            (0, 255, 0),
-            pygame.Rect(
-                pix_square_size * self.target_location[1],
-                pix_square_size * self.target_location[0],
-                pix_square_size,
-                pix_square_size,
-            ),
-        )
-
-        # Draw agent
-        pygame.draw.circle(
-            canvas,
-            (0, 0, 255),
-            (self.agent_location[1] * pix_square_size + pix_square_size // 2,
-             self.agent_location[0] * pix_square_size + pix_square_size // 2),
-            pix_square_size // 3,
-        )
-
-        # Draw obstacles
-        for (i, j) in self.obstacles:
-            pygame.draw.rect(
-                canvas,
-                (255, 0, 0),
-                pygame.Rect(j * pix_square_size, i * pix_square_size, pix_square_size, pix_square_size),
-            )
-
-        # Draw gridlines
-        for x in range(self.grid_size + 1):
-            pygame.draw.line(canvas, (0, 0, 0), (0, x * pix_square_size), (self.window_size, x * pix_square_size), 2)
-            pygame.draw.line(canvas, (0, 0, 0), (x * pix_square_size, 0), (x * pix_square_size, self.window_size), 2)
+        canvas = draw_environment(
+        self.window,
+        self.grid_size,
+        self.cell_size,
+        self.agent_location,
+        self.target_location,
+        self.obstacles
+    )
 
         if self.render_mode == "human":
             self.window.blit(canvas, canvas.get_rect())
@@ -158,10 +130,10 @@ class CustomEnv(gym.Env):
             self.clock.tick(self.metadata["render_fps"])
         else:
             return np.transpose(np.array(pygame.surfarray.pixels3d(canvas)), axes=(1, 0, 2))
-    
+
     def close(self):
         """Close the Pygame window."""
-        if self.screen is not None:
+        if self.window is not None:
             pygame.display.quit()
             pygame.quit()
 
