@@ -2,7 +2,7 @@ from stable_baselines3 import PPO
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from environment.custom_env import CustomEnv
+from environment.custom_env import CustomCareerEnv
 from stable_baselines3.common.callbacks import EvalCallback
 
 def train_pg():

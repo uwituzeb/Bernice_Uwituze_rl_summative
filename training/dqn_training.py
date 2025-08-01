@@ -3,10 +3,10 @@ from stable_baselines3.common.env_util import make_vec_env
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from environment.custom_env import CustomEnv
+from environment.custom_env import CustomCareerEnv
 
 def train_dqn():
-    env = CustomEnv(render_mode="human")
+    env = CustomCareerEnv(render_mode="human")
     model = DQN("MlpPolicy", 
                 env, 
                 verbose=1,

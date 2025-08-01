@@ -43,22 +43,22 @@ class Rendering:
             'grid': (200, 200, 200),
             'agent': (65, 105, 225),  # RoyalBlue
             'agent_glow': (135, 206, 250),  # SkyBlue
-            'course': (34, 139, 34),  # ForestGreen
-            'extracurricular': (0, 191, 255),  # DeepSkyBlue
-            'internship': (138, 43, 226),  # BlueViolet
-            'distraction': (220, 20, 60),  # Crimson
+            'job': (255, 215, 0),  # Gold
+            'phone': (220, 20, 60),  # Crimson
+            'drugs_alcohol': (139, 69, 19),  # SaddleBrown
+            'social_media': (0, 191, 255),  # DeepSkyBlue
             'text': (50, 50, 50),
             'ui_bg': (255, 255, 255, 200),
             'progress_bar': (50, 205, 50),  # LimeGreen
             'progress_bg': (220, 220, 220),
-            'particle_course': (144, 238, 144),  # LightGreen
-            'particle_extracurricular': (173, 216, 230),  # LightBlue
-            'particle_internship': (221, 160, 221),  # Plum
-            'particle_distraction': (255, 182, 193)  # LightCoral
+            'particle_job': (255, 245, 153),  # LightGold
+            'particle_phone': (255, 182, 193),  # LightCoral
+            'particle_drugs_alcohol': (205, 133, 63),  # Peru
+            'particle_social_media': (173, 216, 230),  # LightBlue
         }
         
-        # Animation properties
-        self.animation_speed = 0.1
+        # Animation properties (slower movement)
+        self.animation_speed = 0.05  # Reduced for slower animations
         self.pulse_animation = 0
         self.float_animation = 0
         self.rotation_animation = 0
@@ -90,72 +90,71 @@ class Rendering:
         graphics = {}
         cell_size = self.cell_size
         
-        # Course graphic with gradient
-        course_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
-        # Create gradient effect
+        # Job graphic with briefcase icon
+        job_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
         for i in range(cell_size):
             alpha = int(255 * (1 - i / cell_size))
-            color = (*self.colors['course'], alpha)
-            pygame.draw.line(course_surf, color, (0, i), (cell_size, i))
-        # Add book icon
-        pygame.draw.rect(course_surf, (255, 255, 255), (cell_size//4, cell_size//4, cell_size//2, cell_size//2))
-        pygame.draw.rect(course_surf, self.colors['course'], (cell_size//3, cell_size//3, cell_size//3, cell_size//3))
-        graphics['course'] = course_surf
-        
-        # Extracurricular graphic with star effect
-        extracurricular_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
-        # Gradient background
-        for i in range(cell_size):
-            alpha = int(255 * (1 - i / cell_size))
-            color = (*self.colors['extracurricular'], alpha)
-            pygame.draw.line(extracurricular_surf, color, (0, i), (cell_size, i))
-        # Draw star
-        center = (cell_size//2, cell_size//2)
-        radius = cell_size//3
-        points = []
-        for i in range(10):
-            angle = i * math.pi / 5
-            r = radius if i % 2 == 0 else radius * 0.5
-            x = center[0] + r * math.cos(angle)
-            y = center[1] + r * math.sin(angle)
-            points.append((x, y))
-        if len(points) > 2:
-            pygame.draw.polygon(extracurricular_surf, (255, 255, 255), points)
-        graphics['extracurricular'] = extracurricular_surf
-        
-        # Internship graphic with briefcase
-        internship_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
-        # Gradient background
-        for i in range(cell_size):
-            alpha = int(255 * (1 - i / cell_size))
-            color = (*self.colors['internship'], alpha)
-            pygame.draw.line(internship_surf, color, (0, i), (cell_size, i))
-        # Briefcase
-        handle_width = cell_size//4
-        handle_height = cell_size//6
+            color = (*self.colors['job'], alpha)
+            pygame.draw.line(job_surf, color, (0, i), (cell_size, i))
+        # Briefcase icon
         case_width = cell_size//2
         case_height = cell_size//2
-        pygame.draw.rect(internship_surf, (255, 255, 255), 
+        handle_width = cell_size//4
+        handle_height = cell_size//8
+        pygame.draw.rect(job_surf, (255, 255, 255), 
                         (cell_size//2 - handle_width//2, cell_size//3, handle_width, handle_height))
-        pygame.draw.rect(internship_surf, (255, 255, 255),
+        pygame.draw.rect(job_surf, (255, 255, 255),
                         (cell_size//2 - case_width//2, cell_size//3 + handle_height, case_width, case_height))
-        graphics['internship'] = internship_surf
+        graphics['job'] = job_surf
         
-        # Distraction graphic with warning effect
-        distraction_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
-        # Gradient background
+        # Phone distraction graphic
+        phone_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
         for i in range(cell_size):
             alpha = int(255 * (1 - i / cell_size))
-            color = (*self.colors['distraction'], alpha)
-            pygame.draw.line(distraction_surf, color, (0, i), (cell_size, i))
-        # Phone icon
+            color = (*self.colors['phone'], alpha)
+            pygame.draw.line(phone_surf, color, (0, i), (cell_size, i))
+        # Smartphone icon
         phone_width = cell_size//3
         phone_height = cell_size//2
-        pygame.draw.rect(distraction_surf, (255, 255, 255),
+        pygame.draw.rect(phone_surf, (255, 255, 255),
                         (cell_size//2 - phone_width//2, cell_size//2 - phone_height//2, phone_width, phone_height))
-        pygame.draw.rect(distraction_surf, self.colors['distraction'],
+        pygame.draw.rect(phone_surf, self.colors['phone'],
                         (cell_size//2 - phone_width//3, cell_size//2 - phone_height//3, phone_width//1.5, phone_height//1.5))
-        graphics['distraction'] = distraction_surf
+        graphics['phone'] = phone_surf
+        
+        # Drugs/Alcohol distraction graphic
+        drugs_alcohol_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
+        for i in range(cell_size):
+            alpha = int(255 * (1 - i / cell_size))
+            color = (*self.colors['drugs_alcohol'], alpha)
+            pygame.draw.line(drugs_alcohol_surf, color, (0, i), (cell_size, i))
+        # Bottle icon
+        bottle_width = cell_size//4
+        bottle_height = cell_size//2
+        neck_width = bottle_width//2
+        neck_height = bottle_height//3
+        pygame.draw.rect(drugs_alcohol_surf, (255, 255, 255),
+                        (cell_size//2 - neck_width//2, cell_size//2 - bottle_height//2, neck_width, neck_height))
+        pygame.draw.rect(drugs_alcohol_surf, (255, 255, 255),
+                        (cell_size//2 - bottle_width//2, cell_size//2 - bottle_height//2 + neck_height, bottle_width, bottle_height - neck_height))
+        graphics['drugs_alcohol'] = drugs_alcohol_surf
+        
+        # Social Media distraction graphic
+        social_media_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
+        for i in range(cell_size):
+            alpha = int(255 * (1 - i / cell_size))
+            color = (*self.colors['social_media'], alpha)
+            pygame.draw.line(social_media_surf, color, (0, i), (cell_size, i))
+        # Chat bubble icon
+        bubble_width = cell_size//2
+        bubble_height = cell_size//3
+        pygame.draw.ellipse(social_media_surf, (255, 255, 255),
+                          (cell_size//2 - bubble_width//2, cell_size//2 - bubble_height//2, bubble_width, bubble_height))
+        pygame.draw.polygon(social_media_surf, (255, 255, 255),
+                           [(cell_size//2, cell_size//2 + bubble_height//2),
+                            (cell_size//2 - bubble_width//4, cell_size//2 + bubble_height),
+                            (cell_size//2 + bubble_width//4, cell_size//2 + bubble_height)])
+        graphics['social_media'] = social_media_surf
         
         return graphics
     
@@ -169,9 +168,9 @@ class Rendering:
     
     def update_animations(self, dt: float):
         """Update animation timers and particles"""
-        self.pulse_animation += dt * 3
-        self.float_animation += dt * 2
-        self.rotation_animation += dt * 1.5
+        self.pulse_animation += dt * 1.5  # Slower pulse
+        self.float_animation += dt * 1.0  # Slower float
+        self.rotation_animation += dt * 0.75  # Slower rotation
         
         # Update particles
         self.particles = [p for p in self.particles if not p.is_dead()]
@@ -191,7 +190,7 @@ class Rendering:
         self.flash_effect = intensity
     
     def draw_environment(self, window, agent_location: List[int], 
-                       opportunity_cells: List[Dict], distraction_cells: List[Tuple],
+                       opportunity_cells: List[Dict], distraction_cells: List[Dict],
                        readiness_score: int, steps_taken: int, max_steps: int) -> pygame.Surface:
         """Draw the enhanced environment with advanced effects"""
         canvas = pygame.Surface((self.window_size, self.window_size), pygame.SRCALPHA)
@@ -282,7 +281,8 @@ class Rendering:
     
     def _draw_distractions(self, canvas, distraction_cells, shake_x: float = 0, shake_y: float = 0):
         """Draw distraction cells with warning effects"""
-        for i, j in distraction_cells:
+        for dist in distraction_cells:
+            i, j = dist["pos"]
             x = j * self.cell_size + shake_x
             y = i * self.cell_size + shake_y
             
@@ -293,7 +293,7 @@ class Rendering:
             canvas.blit(warning_surf, (x, y), special_flags=pygame.BLEND_RGBA_MULT)
             
             # Draw the graphic
-            graphic = self.graphics['distraction']
+            graphic = self.graphics[dist["type"]]
             canvas.blit(graphic, (x, y))
     
     def _draw_agent(self, canvas, agent_location, shake_x: float = 0, shake_y: float = 0):
@@ -329,13 +329,11 @@ class Rendering:
     def _draw_particles(self, canvas):
         """Draw particle effects"""
         for particle in self.particles:
-            # alpha = int(255 * (particle.lifetime / particle.max_lifetime))
             color = particle.color
             pygame.draw.circle(canvas, color, (int(particle.x), int(particle.y)), int(particle.size))
     
     def _draw_enhanced_ui(self, canvas, readiness_score, steps_taken, max_steps):
         """Draw enhanced UI elements"""
-        # Create UI panel with gradient
         ui_height = 120
         ui_surf = pygame.Surface((self.window_size, ui_height), pygame.SRCALPHA)
         
@@ -382,10 +380,10 @@ class Rendering:
         # Draw animated legend
         legend_y = 90
         legend_items = [
-            ("Course", self.colors['course']),
-            ("Extracurricular", self.colors['extracurricular']),
-            ("Internship", self.colors['internship']),
-            ("Distraction", self.colors['distraction'])
+            ("Job", self.colors['job']),
+            ("Phone", self.colors['phone']),
+            ("Drugs/Alcohol", self.colors['drugs_alcohol']),
+            ("Social Media", self.colors['social_media'])
         ]
         
         x_offset = 20
@@ -399,4 +397,4 @@ class Rendering:
             x_offset += 150
         
         # Blit UI to canvas
-        canvas.blit(ui_surf, (0, self.window_size - ui_height)) 
+        canvas.blit(ui_surf, (0, self.window_size - ui_height))
