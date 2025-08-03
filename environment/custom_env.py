@@ -89,10 +89,14 @@ class CustomCareerEnv(gym.Env):
 
     def step(self, action):
         self.steps_taken += 1
-        reward = 0.0  # Removed -0.1 step penalty
         done = False
         truncated = False
+        reward = -0.01  # Small step penalty to encourage efficient movement
+
         prev_pos = self.agent_location.copy()
+        old_distance = self._distance_to_closest_opportunity()
+
+        # Move the agent based on action
         if action == 0 and self.agent_location[0] > 0:
             self.agent_location[0] -= 1
         elif action == 1 and self.agent_location[0] < self.grid_size - 1:
@@ -101,48 +105,58 @@ class CustomCareerEnv(gym.Env):
             self.agent_location[1] -= 1
         elif action == 3 and self.agent_location[1] < self.grid_size - 1:
             self.agent_location[1] += 1
-        elif action == 4:
+        elif action == 4:  # Use opportunity
             for opp in self.opportunity_cells[:]:
                 if tuple(self.agent_location) == opp["pos"]:
-                    reward = 25.0
-                    self.readiness_score += 25
-                    x = self.agent_location[1] * self.renderer.cell_size + self.renderer.cell_size // 2
-                    y = self.agent_location[0] * self.renderer.cell_size + self.renderer.cell_size // 2
-                    self.renderer.add_particles(x, y, self.renderer.colors['particle_job'], 20)
-                    self.renderer.trigger_screen_shake(10)
-                    self.renderer.trigger_flash(0.5)
+                    reward += 50.0
+                    self.readiness_score += 50
                     self.opportunity_cells.remove(opp)
                     break
+
+        # Distance-based shaping
+        new_distance = self._distance_to_closest_opportunity()
+        if new_distance < old_distance:
+            reward += 0.5
+        elif new_distance > old_distance:
+            reward -= 0.1
+
+        # Distraction penalty
         for dist in self.distraction_cells:
             if tuple(self.agent_location) == dist["pos"]:
-                reward = -8.0
-                self.readiness_score = max(0, self.readiness_score - 8)
-                self.agent_location = prev_pos
-                x = self.agent_location[1] * self.renderer.cell_size + self.renderer.cell_size // 2
-                y = self.agent_location[0] * self.renderer.cell_size + self.renderer.cell_size // 2
-                particle_color = self.renderer.colors[f'particle_{dist["type"]}']
-                self.renderer.add_particles(x, y, particle_color, 8)
-                self.renderer.trigger_screen_shake(8)
-                self.renderer.trigger_flash(0.5)
+                reward = -2.0
+                self.readiness_score = max(0, self.readiness_score - 2)
                 break
+
+        # Reward streak bonus
         if reward > 0:
             self.consecutive_positive_rewards += 1
             if self.consecutive_positive_rewards >= 3:
-                reward += 2.0
+                reward += 2.0  # Small bonus
                 self.consecutive_positive_rewards = 0
         else:
             self.consecutive_positive_rewards = 0
+
+        # Termination
         if self.steps_taken >= self.max_steps:
             truncated = True
         if len(self.opportunity_cells) == 0:
             done = True
-            reward += 25.0
-            self.renderer.trigger_screen_shake(15)
-            self.renderer.trigger_flash(1.0)
+            reward += 50.0  # Success bonus
+
         self.last_reward = reward
+
         if self.render_mode == "human":
             self.render()
+
         return self._get_observation(), reward, done, truncated, {}
+    
+    def _distance_to_closest_opportunity(self):
+        if not self.opportunity_cells:
+            return 0
+        return min(
+            abs(self.agent_location[0] - opp["pos"][0]) + abs(self.agent_location[1] - opp["pos"][1])
+            for opp in self.opportunity_cells
+        )
 
     def render(self):
         if self.window is None and self.render_mode == "human":
@@ -164,7 +178,7 @@ class CustomCareerEnv(gym.Env):
             self.max_steps
         )
         self.window.blit(canvas, canvas.get_rect())
-        if self.record_gif and self.steps_taken % 2 == 0:  # Capture every other frame
+        if self.record_gif and self.steps_taken % 2 == 0 and len(self.frames) < 200:  # Limit to 200 frames
             frame = pygame.surfarray.array3d(canvas)
             frame = np.transpose(frame, (1, 0, 2))
             self.frames.append(frame)
