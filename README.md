@@ -76,6 +76,8 @@ python plot_rewards.py
 
 ## Cumulative Reward Plot Interpretation
 
+![Cumulative Rewards](https://raw.githubusercontent.com/uwituzeb/Bernice_Uwituze_rl_summative/main/cumulative_rewards_plot.png)
+
 - **DQN**: Our DQN training showed steady growth with the agent consistenly learning and collecting positive rewards
 - **PPO**: Our PPO algorithm seemed to outperform all other methods with a quick reward collection as shown by the sharp upward slope.
 - **A2C**: Our A2C algorithm started off well but quickly stagnated showing that there may have been early convergence
