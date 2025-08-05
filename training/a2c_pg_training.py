@@ -3,9 +3,11 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from environment.custom_env import CustomCareerEnv
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import DummyVecEnv
 
 def train_a2c():
-    env = CustomCareerEnv(render_mode="human")
+    env = DummyVecEnv([lambda: Monitor(CustomCareerEnv(render_mode="rgb_array"), filename="./logs/a2c_monitor.csv")])
 
     model = A2C(
         "MlpPolicy",

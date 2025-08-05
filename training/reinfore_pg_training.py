@@ -6,6 +6,7 @@ import numpy as np
 from torch.distributions import Categorical
 import sys
 import os
+import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from environment.custom_env import CustomCareerEnv
 
@@ -25,7 +26,7 @@ class PolicyNetwork(nn.Module):
 def train_reinforce(episodes=500):
     env = CustomCareerEnv()
     
-    # Handle environments with tuple observation space
+    # Observation and action space sizes
     sample_obs = env.reset()
     sample_obs = sample_obs[0] if isinstance(sample_obs, tuple) else sample_obs
     obs_size = np.array(sample_obs).shape[0]
@@ -34,6 +35,8 @@ def train_reinforce(episodes=500):
     policy = PolicyNetwork(obs_size, n_actions)
     optimizer = optim.Adam(policy.parameters(), lr=1e-2)
     gamma = 0.99
+
+    all_rewards = []
 
     for episode in range(episodes):
         reset_output = env.reset()
@@ -44,7 +47,6 @@ def train_reinforce(episodes=500):
         done = False
 
         while not done:
-            # Ensure state is a NumPy array
             state = np.array(state, dtype=np.float32)
             state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
 
@@ -54,7 +56,6 @@ def train_reinforce(episodes=500):
 
             step_output = env.step(action.item())
 
-            # Handle both Gym API formats
             if len(step_output) == 5:
                 next_state, reward, terminated, truncated, _ = step_output
                 done = terminated or truncated
@@ -65,7 +66,10 @@ def train_reinforce(episodes=500):
             rewards.append(reward)
             state = next_state
 
-        # Compute returns
+        total_reward = sum(rewards)
+        all_rewards.append(total_reward)
+        print(f"Episode {episode + 1}, Total reward: {total_reward}")
+
         returns = []
         G = 0
         for r in reversed(rewards):
@@ -81,10 +85,11 @@ def train_reinforce(episodes=500):
         loss.backward()
         optimizer.step()
 
-        print(f"Episode {episode + 1}, Total reward: {sum(rewards)}")
-
     torch.save(policy.state_dict(), "models/reinforce_policy.pth")
     print("REINFORCE training complete and model saved!")
+
+    os.makedirs("logs/reinforce", exist_ok=True)
+    pd.DataFrame(all_rewards, columns=["r"]).to_csv("logs/reinforce/reinforce_rewards.csv", index=False)
 
 if __name__ == "__main__":
     train_reinforce()

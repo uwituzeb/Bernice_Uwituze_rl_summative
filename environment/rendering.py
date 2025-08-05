@@ -23,9 +23,9 @@ class Particle:
         """Update particle physics"""
         self.x += self.vx * dt
         self.y += self.vy * dt
-        self.vy += 50 * dt  # Gravity
+        self.vy += 50 * dt
         self.lifetime -= dt
-        self.size *= 0.99  # Shrink over time
+        self.size *= 0.99
     
     def is_dead(self) -> bool:
         return self.lifetime <= 0
@@ -39,26 +39,26 @@ class Rendering:
         
         # Enhanced colors with gradients
         self.colors = {
-            'background': (240, 248, 255),  # AliceBlue
+            'background': (240, 248, 255),
             'grid': (200, 200, 200),
-            'agent': (65, 105, 225),  # RoyalBlue
-            'agent_glow': (135, 206, 250),  # SkyBlue
-            'job': (255, 215, 0),  # Gold
-            'phone': (220, 20, 60),  # Crimson
-            'drugs_alcohol': (139, 69, 19),  # SaddleBrown
-            'social_media': (0, 191, 255),  # DeepSkyBlue
+            'agent': (65, 105, 225),
+            'agent_glow': (135, 206, 250),
+            'job': (255, 215, 0),
+            'phone': (220, 20, 60),
+            'drugs_alcohol': (139, 69, 19),
+            'social_media': (0, 191, 255),
             'text': (50, 50, 50),
             'ui_bg': (255, 255, 255, 200),
-            'progress_bar': (50, 205, 50),  # LimeGreen
+            'progress_bar': (50, 205, 50),
             'progress_bg': (220, 220, 220),
-            'particle_job': (255, 245, 153),  # LightGold
-            'particle_phone': (255, 182, 193),  # LightCoral
-            'particle_drugs_alcohol': (205, 133, 63),  # Peru
-            'particle_social_media': (173, 216, 230),  # LightBlue
+            'particle_job': (255, 245, 153),
+            'particle_phone': (255, 182, 193),
+            'particle_drugs_alcohol': (205, 133, 63),
+            'particle_social_media': (173, 216, 230),
         }
         
         # Animation properties (slower movement)
-        self.animation_speed = 0.05  # Reduced for slower animations
+        self.animation_speed = 0.05
         self.pulse_animation = 0
         self.float_animation = 0
         self.rotation_animation = 0
@@ -168,10 +168,10 @@ class Rendering:
     
     def update_animations(self, dt: float):
         """Update animation timers and particles"""
-        self.pulse_animation += dt * 1.5  # Slower pulse
-        self.float_animation += dt * 1.0  # Slower float
-        self.rotation_animation += dt * 0.75  # Slower rotation
-        
+        self.pulse_animation += dt * 1.5
+        self.float_animation += dt * 1.0
+        self.rotation_animation += dt * 0.75
+
         # Update particles
         self.particles = [p for p in self.particles if not p.is_dead()]
         for particle in self.particles:

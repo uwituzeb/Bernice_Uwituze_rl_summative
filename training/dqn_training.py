@@ -10,9 +10,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from environment.custom_env import CustomCareerEnv
 
 def train_dqn():
-    env = DummyVecEnv([lambda: Monitor(CustomCareerEnv(render_mode="rgb_array"))])
+    log_dir = "./logs/dqn"
+    os.makedirs(log_dir, exist_ok=True)
+
+    # Create a vectorized environment with monitoring
+    env = DummyVecEnv([
+        lambda: Monitor(CustomCareerEnv(render_mode="rgb_array"), filename=os.path.join(log_dir, "monitor.csv"))
+    ])
     env = VecNormalize(env, norm_obs=True, norm_reward=False)
-    eval_env = DummyVecEnv([lambda: Monitor(CustomCareerEnv(render_mode="rgb_array"))])
+    eval_env = DummyVecEnv([
+        lambda: Monitor(CustomCareerEnv(render_mode="rgb_array"))
+    ])
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False)
     eval_env.training = False
     eval_env.norm_reward = False
